@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import moment from "moment";
 import { StyleSheet, Text, View, FlatList, ActivityIndicator, Alert, TouchableOpacity, Linking} from 'react-native';
 class home extends Component {
 
@@ -16,15 +17,14 @@ class home extends Component {
     }
 
     makeRequest = async () => {
-        var url = "https://economia.awesomeapi.com.br/all/USD-BRL,EUR-BRL,BTC-BRL"
+        var url = "https://economia.awesomeapi.com.br/all"
         axios.get(url)
         .then(response => {
-            var tempDataUSD = [response.data.USD]
-            var tempDataEUR = [response.data.EUR]
-            var tempDataBTC = [response.data.BTC]
-            var fullData = [...tempDataUSD, ...tempDataEUR, ...tempDataBTC]
+            var fullData = [response.data.BTC, response.data.AUD,response.data.CAD,response.data.USD,response.data.USDT, response.data.EUR, response.data.JPY,response.data.GBP, response.data.LTC, response.data.ARS]
+            for(let i = 0; i < fullData.length; i++){
+              fullData[i].create_date = moment(new Date(fullData[i].timestamp * 1000)).format('DD/MM/YYYY hh:MM');
+            }
             this.setState({dataSource: fullData, isLoading:false})
-            console.log(this.state.dataSource[1].code)
         })
         .catch(err =>{
             alert(`Não foi possível os dados${err}`)
@@ -36,7 +36,7 @@ class home extends Component {
         return (
           <View elevation={1} 
             style={{
-              height: 100,
+              height: 120,
               width: "97%",
               margin: 5,
               backgroundColor: "#1E1E1E",
@@ -93,10 +93,17 @@ class home extends Component {
           }}
           renderItem={({ item }) => 
           <View style={styles.horizontalContainer}>
-              <TouchableOpacity style={styles.TouchableOpacity} onPress={() => Alert.alert('INFORMAÇÕES DE HOJE',`Máximo: R$${item.high}\nMínimo R$${item.low}\nVariação: R$${item.varBid}(${item.pctChange}%)`)}>
+            <TouchableOpacity style={styles.TouchableOpacity} onPress={() => Alert.alert('INFORMAÇÕES DE HOJE',`Máximo: R$${item.high}\nMínimo R$${item.low}\nVariação: R$${item.varBid}(${item.pctChange}%)\nValor de venda:R$${item.ask}\nÚltima atualização: ${item.create_date}`)}>
               <Text style={styles.textNameCurrency}>{item.name}({item.code})</Text>
-              <Text style={styles.textValueCurrency}>R$ {item.bid}</Text>
-              </TouchableOpacity>
+              <View
+                style={{
+                height: 20,
+                width: "0.25%",
+                backgroundColor: "#000",
+                }}
+              />
+              <Text style={styles.textValueCurrency}>R${item.bid}</Text>
+            </TouchableOpacity>
           </View>
         }
           
@@ -112,29 +119,34 @@ export default home
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#1E1E1E',
-        paddingStart: 10,
-        paddingEnd: 10,
-        paddingTop: 25
+      flex: 1,
+      backgroundColor: '#1E1E1E',
+      paddingStart: 10,
+      paddingEnd: 10,
+      paddingTop: 25
     },
     TouchableOpacity:{
-        width:'100%'
+        width:'100%',
+        flexDirection:'row'
     },
     horizontalContainer: {
         backgroundColor: "#1E1E1E",
-        flexDirection: 'row',
-        height: 50,
+        flexDirection:'row',
+        flex:1,
+        height: 25,
         width: '100%',
     },
     textNameCurrency: {
         color: "#E8E8E8",
         fontWeight: "bold",
         fontSize: 20,
-        width:'100%'
+        width:'55%'
     },
     textValueCurrency: {
         color: "#E8E8E8",
-        width:'50%'
+        fontWeight: "bold",
+        width:'39%',
+        fontSize:15,
+        paddingStart:20
     }
 })
