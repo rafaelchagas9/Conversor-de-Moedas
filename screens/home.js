@@ -1,19 +1,28 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import moment from "moment";
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, Alert, TouchableOpacity, Linking} from 'react-native';
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, Alert, TouchableOpacity, Image, Button} from 'react-native';
 class home extends Component {
 
     constructor(props){
         super(props)
         this.state = {
             dataSource: [],
-            isLoading: true
+            isLoading: true,
+            bidOrAsk: 'Compra'
         }
     }
 
       componentDidMount(){
         this.makeRequest()
+    }
+
+    handleClick = () => {
+      if(this.state.bidOrAsk == 'Compra'){
+        this.setState({bidOrAsk: 'Venda'})
+      }else{
+        this.setState({bidOrAsk: 'Compra'})
+      }
     }
 
     makeRequest = async () => {
@@ -33,6 +42,7 @@ class home extends Component {
 
 
     FlatListHeader = () => {
+      if(this.state.bidOrAsk == 'bid'){
         return (
           <View elevation={1} 
             style={{
@@ -54,7 +64,29 @@ class home extends Component {
           >
             <Text style={{  textShadowColor: 'black', color: "#E8E8E8", textShadowOffset: { width: 1, height: 3 },textShadowRadius: 10, fontSize: 40, fontWeight: '800', flex: 1, alignSelf: "center", paddingTop: 30, fontSize: 40}}>Valores(Compra)</Text>
           </View>
-        );
+        )}else{
+          return(
+          <View elevation={1} 
+            style={{
+              height: 120,
+              width: "97%",
+              margin: 5,
+              backgroundColor: "#121212",
+              border: 4.9,
+              borderColor: "black",
+              alignSelf: "center",
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 16,
+              },
+              shadowOpacity: 20,
+              shadowRadius: 7.49
+            }}
+          >
+            <Text style={{textShadowColor: 'black', color: "#fff", opacity:0.8, textShadowOffset: { width: 1, height: 3 },textShadowRadius: 10, fontSize: 40, fontWeight: '800', flex: 1, alignSelf: "center", paddingTop: 30, fontSize: 40}}>Valores(Venda)</Text>
+          </View>
+          )}
       }
 
       FlatListItemSeparator = () => {
@@ -92,6 +124,7 @@ class home extends Component {
           onEndReached={({ distanceFromEnd }) => {
           }}
           renderItem={({ item }) => 
+          this.state.bidOrAsk == 'Compra' ?
           <View style={styles.horizontalContainer}>
             <TouchableOpacity style={styles.TouchableOpacity} onPress={() => Alert.alert('INFORMAÇÕES DE HOJE',`Máximo: R$${item.high}\nMínimo R$${item.low}\nVariação: R$${item.varBid}(${item.pctChange}%)\nValor de venda:R$${item.ask}\nÚltima atualização: ${item.create_date}`)}>
               <Text style={styles.textNameCurrency}>{item.name}({item.code})</Text>
@@ -104,10 +137,22 @@ class home extends Component {
               />
               <Text style={styles.textValueCurrency}>R${item.bid}</Text>
             </TouchableOpacity>
-          </View>
+          </View> :
+          <View style={styles.horizontalContainer}>
+          <TouchableOpacity style={styles.TouchableOpacity} onPress={() => Alert.alert('INFORMAÇÕES DE HOJE',`Máximo: R$${item.high}\nMínimo R$${item.low}\nVariação: R$${item.varBid}(${item.pctChange}%)\nValor de venda:R$${item.ask}\nÚltima atualização: ${item.create_date}`)}>
+            <Text style={styles.textNameCurrency}>{item.name}({item.code})</Text>
+            <View
+              style={{
+              height: 20,
+              width: "0.25%"
+              }}
+            />
+            <Text style={styles.textValueCurrency}>R${item.ask}</Text>
+          </TouchableOpacity>
+        </View>
         }
-          
         />
+        <Button onPress={this.handleClick} title={`Visualizando valor de ${this.state.bidOrAsk}. Clique para alterar`}/>
       </View>
             )
         }
@@ -120,17 +165,18 @@ export default home
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#1E1E1E',
+      backgroundColor: '#121212',
       paddingStart: 10,
       paddingEnd: 10,
-      paddingTop: 25
+      paddingTop: 25,
+      paddingBottom:5
     },
     TouchableOpacity:{
         width:'100%',
         flexDirection:'row'
     },
     horizontalContainer: {
-        backgroundColor: "#1E1E1E",
+        backgroundColor: "#121212",
         flexDirection:'row',
         flex:1,
         height: 25,
@@ -138,6 +184,7 @@ const styles = StyleSheet.create({
     },
     textNameCurrency: {
         color: "#E8E8E8",
+        opacity: 0.8,
         fontWeight: "bold",
         fontSize: 20,
         width:'55%'
@@ -145,6 +192,7 @@ const styles = StyleSheet.create({
     textValueCurrency: {
         color: "#E8E8E8",
         fontWeight: "bold",
+        opacity: 0.8,
         width:'39%',
         fontSize:15,
         paddingStart:20

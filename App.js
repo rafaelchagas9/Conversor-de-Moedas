@@ -26,7 +26,7 @@ const TabNavigator = createBottomTabNavigator({
   {
     tabBarOptions:{
       style:{
-        backgroundColor: "#0d0d0d"
+        backgroundColor: "#000000"
       }
     }
   }
