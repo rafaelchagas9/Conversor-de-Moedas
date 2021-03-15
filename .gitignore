@@ -14,3 +14,8 @@ web-report/
 .DS_Store
 assets/images/usa.png
 assets/images/brazil.png
+
+# Expo
+.expo
+__generated__
+web-build
